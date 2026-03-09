@@ -18,3 +18,15 @@ thingproxy.freeboard.io — last resort
 If the first works, it uses it for all subsequent fetches. If your corporate network blocks any of them it moves on automatically.
 One caveat — these are free public proxies, fine for personal EOD use but don't abuse them. If all three fail (unlikely but possible on a locked-down network), 
 the permanent solution would be a tiny local Python proxy server.
+
+Use localStorage to persist the sector list between reloads. Every time you add, remove, or toggle visibility it saves to the browser's local storage and reloads from it on startup.
+Everything persists in localStorage now — saved on every action, restored on every reload:
+Action              Persisted
+Add sector          ✓
+Remove sector       ✓
+Hide/show sector    ✓
+Change tail length  ✓
+Change benchmark    ✓
+
+One note — localStorage is scoped to the file path in the browser. As long as you always open the same sector-rotation-map.html from the same location, your settings will be there. 
+If you ever move the file, just add/remove your sectors once and it'll save again from the new path.
