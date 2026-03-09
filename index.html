@@ -142,6 +142,7 @@ const DEFAULT_SECTORS = [
   {ticker:"XLU",  name:"Utilities",          color:"#ffa657"},
   {ticker:"XLRE", name:"Real Estate",        color:"#ff7b72"},
   {ticker:"XLC",  name:"Comm. Services",     color:"#e3b341"},
+  {ticker:"SMH",  name:"Semiconductors",     color:"#3fb950"},
 ];
 
 const EXTRA_COLORS = [
@@ -150,11 +151,46 @@ const EXTRA_COLORS = [
 ];
 
 // ── STATE ────────────────────────────────────────────────
-let tailWeeks = 8;
-let hiddenSet = new Set();
-let sectors   = JSON.parse(JSON.stringify(DEFAULT_SECTORS));
-let rrgData   = {};
-let svgEl     = null;
+const LS_SECTORS  = "rrg_sectors";
+const LS_HIDDEN   = "rrg_hidden";
+const LS_TAIL     = "rrg_tail";
+const LS_BENCH    = "rrg_benchmark";
+
+function loadPrefs() {
+  try {
+    const s = localStorage.getItem(LS_SECTORS);
+    const h = localStorage.getItem(LS_HIDDEN);
+    const t = localStorage.getItem(LS_TAIL);
+    const b = localStorage.getItem(LS_BENCH);
+    if (s) sectors = JSON.parse(s);
+    if (h) hiddenSet = new Set(JSON.parse(h));
+    if (t) tailWeeks = +t;
+    if (b) {
+      BENCHMARK = b;
+      const sel = document.getElementById("bench-select");
+      if (sel) sel.value = b;
+    }
+    // Sync active tail button
+    document.querySelectorAll(".tbtn").forEach(btn => {
+      btn.classList.toggle("active", +btn.dataset.w === tailWeeks);
+    });
+  } catch(e) { console.warn("Could not load prefs", e); }
+}
+
+function savePrefs() {
+  try {
+    localStorage.setItem(LS_SECTORS, JSON.stringify(sectors));
+    localStorage.setItem(LS_HIDDEN,  JSON.stringify([...hiddenSet]));
+    localStorage.setItem(LS_TAIL,    tailWeeks);
+    localStorage.setItem(LS_BENCH,   BENCHMARK);
+  } catch(e) { console.warn("Could not save prefs", e); }
+}
+
+let tailWeeks   = 8;
+let hiddenSet   = new Set();
+let sectors     = JSON.parse(JSON.stringify(DEFAULT_SECTORS));
+let rrgData     = {};
+let svgEl       = null;
 let benchCloses = [];
 
 // ── FETCH ────────────────────────────────────────────────
@@ -233,6 +269,7 @@ async function changeBenchmark(val) {
   BENCHMARK = val;
   rrgData = {};
   benchCloses = [];
+  savePrefs();
   setStatus("Reloading...", true);
   await loadAll(sectors.map(s => s.ticker));
   renderChart();
@@ -308,6 +345,7 @@ function renderSidebar() {
 
 function toggleSector(ticker) {
   hiddenSet.has(ticker) ? hiddenSet.delete(ticker) : hiddenSet.add(ticker);
+  savePrefs();
   renderChart(); renderSidebar();
 }
 
@@ -316,6 +354,7 @@ function removeSector(ticker, e) {
   sectors = sectors.filter(s => s.ticker !== ticker);
   hiddenSet.delete(ticker);
   delete rrgData[ticker];
+  savePrefs();
   renderChart(); renderSidebar();
 }
 
@@ -341,6 +380,7 @@ async function addFromModal() {
   } catch(e) {
     setStatus(`Failed: ${ticker}`);
   }
+  savePrefs();
   renderChart(); renderSidebar();
 }
 
@@ -470,6 +510,7 @@ document.querySelectorAll(".tbtn").forEach(btn => {
     tailWeeks = +btn.dataset.w;
     document.querySelectorAll(".tbtn").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
+    savePrefs();
     renderChart(); renderSidebar();
   });
 });
@@ -480,6 +521,7 @@ window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(renderChart
 
 // ── INIT ─────────────────────────────────────────────────
 (async () => {
+  loadPrefs();
   await loadAll(sectors.map(s=>s.ticker));
   renderChart();
   renderSidebar();
