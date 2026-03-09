@@ -1,772 +1,489 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <style>
-        /* Landscape Mobile Optimized CSS */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html, body {
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: #0f1419;
-            color: #e6edf3;
-            touch-action: manipulation;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            padding: 0;
-        }
-
-        /* Header optimized for landscape */
-        .header {
-            flex-shrink: 0;
-            padding: 12px 16px;
-            background: linear-gradient(90deg, #1a2332 0%, #161d2b 100%);
-            border-bottom: 1px solid #2d3746;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header h1 {
-            font-size: 20px;
-            font-weight: 700;
-            background: linear-gradient(90deg, #58a6ff, #2ea043);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            white-space: nowrap;
-        }
-
-        .header-controls {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        /* Status badge for landscape */
-        .status-badge {
-            background: rgba(46, 160, 67, 0.15);
-            color: #2ea043;
-            padding: 5px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            border: 1px solid rgba(46, 160, 67, 0.3);
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .status-badge::before {
-            content: "";
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #2ea043;
-        }
-
-        /* Main content area for landscape */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            padding: 16px;
-        }
-
-        /* Table container for wide screen */
-        .table-container {
-            flex: 1;
-            background: #161b22;
-            border-radius: 12px;
-            border: 1px solid #30363d;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-        }
-
-        /* Grid layout optimized for landscape (5 columns) */
-        .table-header {
-            display: grid;
-            grid-template-columns: 1.5fr 0.8fr 1fr 1fr 1fr;
-            background: #1a1f2e;
-            padding: 14px 16px;
-            font-weight: 700;
-            font-size: 13px;
-            color: #8b949e;
-            border-bottom: 2px solid #2d3746;
-            flex-shrink: 0;
-        }
-
-        .table-row {
-            display: grid;
-            grid-template-columns: 1.5fr 0.8fr 1fr 1fr 1fr;
-            padding: 14px 16px;
-            align-items: center;
-            border-bottom: 1px solid #2d3746;
-            transition: background-color 0.2s;
-            font-size: 14px;
-        }
-
-        .table-row:last-child {
-            border-bottom: none;
-        }
-
-        .table-row:hover {
-            background-color: rgba(88, 166, 255, 0.05);
-        }
-
-        /* Column styling */
-        .col-sector {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            overflow: hidden;
-        }
-
-        .col-ticker {
-            text-align: left;
-            font-weight: 600;
-            color: #c9d1d9;
-        }
-
-        .col-price {
-            text-align: right;
-            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
-            font-weight: 600;
-            color: #e6edf3;
-        }
-
-        .col-change {
-            text-align: right;
-            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
-            font-weight: 700;
-            padding: 4px 8px;
-            border-radius: 6px;
-            justify-self: end;
-            min-width: 80px;
-            text-align: center;
-        }
-
-        .col-updated {
-            text-align: right;
-            font-size: 12px;
-            color: #8b949e;
-            white-space: nowrap;
-        }
-
-        /* Color indicators */
-        .sector-color {
-            width: 14px;
-            height: 14px;
-            border-radius: 4px;
-            flex-shrink: 0;
-        }
-
-        .positive {
-            background: rgba(46, 160, 67, 0.15);
-            color: #2ea043;
-        }
-
-        .negative {
-            background: rgba(248, 81, 73, 0.15);
-            color: #f85149;
-        }
-
-        /* Loading and empty states */
-        #sectors-table {
-            flex: 1;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            min-height: 0;
-        }
-
-        .loading, .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 60px 20px;
-            text-align: center;
-            color: #8b949e;
-        }
-
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid #30363d;
-            border-top-color: #58a6ff;
-            border-radius: 50%;
-            margin-bottom: 16px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Footer for landscape */
-        .footer {
-            flex-shrink: 0;
-            padding: 12px 16px;
-            text-align: center;
-            font-size: 11px;
-            color: #8b949e;
-            border-top: 1px solid #2d3746;
-            background: #161b22;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .refresh-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .refresh-btn {
-            background: #1a1f2e;
-            border: 1px solid #30363d;
-            color: #e6edf3;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .refresh-btn:hover {
-            background: #2d3746;
-        }
-
-        .refresh-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* Update indicator */
-        .update-indicator {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-        }
-
-        .update-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #2ea043;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* Sort controls */
-        .sort-controls {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 4px;
-        }
-
-        .sort-btn {
-            background: #1a1f2e;
-            border: 1px solid #30363d;
-            color: #8b949e;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s;
-        }
-
-        .sort-btn:hover {
-            background: #2d3746;
-        }
-
-        .sort-btn.active {
-            background: #1f6feb;
-            border-color: #1f6feb;
-            color: #ffffff;
-        }
-
-        /* For very wide screens (tablet landscape) */
-        @media (min-width: 1024px) {
-            .table-header, .table-row {
-                grid-template-columns: 1.8fr 0.8fr 1fr 1fr 1.2fr;
-            }
-        }
-
-        /* For narrow landscape (some phones) */
-        @media (max-width: 740px) and (orientation: landscape) {
-            .table-header, .table-row {
-                grid-template-columns: 1.3fr 0.7fr 0.9fr 0.9fr 1fr;
-                padding: 12px;
-                font-size: 13px;
-            }
-            
-            .col-updated {
-                font-size: 11px;
-            }
-        }
-
-        /* Hide scrollbar but keep functionality */
-        #sectors-table::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        #sectors-table::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        #sectors-table::-webkit-scrollbar-thumb {
-            background: #30363d;
-            border-radius: 2px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sector Rotation Map</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+:root {
+  --bg:#0d1117; --panel:#161b22; --border:#21262d;
+  --text:#e6edf3; --muted:#7d8590; --blue:#58a6ff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'SF Mono','Fira Code',Consolas,monospace;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+header{background:var(--panel);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;flex-shrink:0}
+.title{font-size:13px;font-weight:700;letter-spacing:.05em}
+.subtitle{font-size:10px;color:var(--muted);margin-top:2px}
+.hright{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.tail-label{font-size:10px;color:var(--muted)}
+.tail-btns{display:flex;gap:3px}
+.tbtn{background:transparent;border:1px solid var(--border);color:var(--muted);font-size:10px;font-family:inherit;padding:3px 8px;border-radius:3px;cursor:pointer;transition:all .15s}
+.tbtn:hover{border-color:var(--blue);color:var(--blue)}
+.tbtn.active{background:#58a6ff22;border-color:var(--blue);color:var(--blue)}
+#status{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.spin{width:10px;height:10px;border:1.5px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;display:none}
+.spin.on{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.main{display:flex;flex:1;overflow:hidden}
+#chart{flex:1;position:relative;overflow:hidden}
+svg{display:block}
+.qlabel{font-size:11px;font-weight:700;letter-spacing:.12em;fill:rgba(255,255,255,.1);text-transform:uppercase;pointer-events:none}
+.sidebar{width:220px;border-left:1px solid var(--border);background:var(--panel);overflow-y:auto;flex-shrink:0}
+.sb-head{font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;padding:10px 14px 8px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.sb-add{font-size:10px;color:var(--blue);cursor:pointer;border:1px solid var(--border);border-radius:3px;padding:2px 7px;background:transparent;font-family:inherit}
+.sb-add:hover{background:#58a6ff22}
+.srow{display:flex;align-items:center;padding:6px 14px;gap:8px;cursor:pointer;transition:background .12s;user-select:none}
+.srow:hover{background:rgba(255,255,255,.04)}
+.srow.hidden{opacity:.3}
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sinfo{flex:1;min-width:0}
+.sticker{font-size:11px;font-weight:600}
+.sname{font-size:9px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.svals{text-align:right;flex-shrink:0}
+.sratio{font-size:10px}
+.sphase{font-size:9px;font-weight:700;letter-spacing:.06em;margin-top:1px;text-transform:uppercase}
+.LEADING{color:#3fb950}.WEAKENING{color:#d29922}.LAGGING{color:#f85149}.IMPROVING{color:#58a6ff}
+.sdel{font-size:11px;color:var(--muted);padding:0 4px;opacity:0;transition:opacity .15s;cursor:pointer;flex-shrink:0}
+.srow:hover .sdel{opacity:1}
+.sdel:hover{color:#f85149}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:200}
+.modal-bg.open{display:flex}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:20px;width:300px}
+.modal h3{font-size:13px;margin-bottom:12px}
+.modal input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:inherit;font-size:12px;padding:7px 10px;outline:none;margin-bottom:10px}
+.modal input:focus{border-color:var(--blue)}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end}
+.mbtn{background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:inherit;font-size:11px;padding:5px 14px;cursor:pointer;transition:all .15s}
+.mbtn.primary{background:var(--blue);border-color:var(--blue);color:#000;font-weight:600}
+.mbtn:hover:not(.primary){border-color:var(--blue);color:var(--blue)}
+#tip{position:fixed;background:#1c2128;border:1px solid var(--border);border-radius:6px;padding:10px 13px;font-size:11px;pointer-events:none;opacity:0;transition:opacity .1s;z-index:100;min-width:160px;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+#tip.on{opacity:1}
+#tip .tt{font-size:13px;font-weight:700;margin-bottom:5px}
+#tip .tr{display:flex;justify-content:space-between;gap:16px;color:var(--muted);margin-top:3px}
+#tip .tr span:last-child{color:var(--text);font-weight:500}
+.bmark-label{font-size:10px;color:var(--muted)}
+.bmark-select{background:var(--bg);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:inherit;font-size:10px;padding:3px 8px;outline:none;cursor:pointer}
+.bmark-select:focus{border-color:var(--blue)}
+</style>
 </head>
 <body>
-    <!-- Header optimized for landscape -->
-    <div class="header">
-        <h1>US Sectors Performance</h1>
-        <div class="header-controls">
-            <div class="status-badge">LIVE UPDATING</div>
-        </div>
+<header>
+  <div>
+    <div class="title">SECTOR ROTATION MAP</div>
+    <div class="subtitle" id="subtitle">11 GICS Sector ETFs vs SPY &nbsp;&middot;&nbsp; Weekly bars</div>
+  </div>
+  <div class="hright">
+    <div style="display:flex;align-items:center;gap:6px">
+      <span class="bmark-label">BENCHMARK</span>
+      <select class="bmark-select" id="bench-select" onchange="changeBenchmark(this.value)">
+        <option value="SPY">SPY — S&amp;P 500</option>
+        <option value="QQQ">QQQ — Nasdaq 100</option>
+        <option value="DIA">DIA — Dow Jones</option>
+        <option value="IWM">IWM — Russell 2000</option>
+        <option value="VTI">VTI — Total Market</option>
+      </select>
     </div>
-
-    <!-- Main content area -->
-    <div class="main-content">
-        <!-- Sort controls -->
-        <div class="sort-controls">
-            <button class="sort-btn active" data-sort="change">📈 Change %</button>
-            <button class="sort-btn" data-sort="sector">🔤 Sector</button>
-            <button class="sort-btn" data-sort="price">💰 Price</button>
-            <button class="sort-btn" data-sort="ticker">🏷️ Ticker</button>
-        </div>
-
-        <!-- Table container -->
-        <div class="table-container">
-            <div class="table-header">
-                <div class="col-sector">Sector</div>
-                <div class="col-ticker">ETF</div>
-                <div class="col-price">Price</div>
-                <div class="col-change">Change</div>
-                <div class="col-updated">Updated</div>
-            </div>
-            
-            <div id="sectors-table">
-                <div class="loading">
-                    <div class="loading-spinner"></div>
-                    <p>Loading sector data...</p>
-                </div>
-            </div>
-        </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <span class="tail-label">TAIL</span>
+      <div class="tail-btns">
+        <button class="tbtn" data-w="1">1W</button>
+        <button class="tbtn" data-w="4">4W</button>
+        <button class="tbtn active" data-w="8">8W</button>
+        <button class="tbtn" data-w="12">12W</button>
+        <button class="tbtn" data-w="16">16W</button>
+        <button class="tbtn" data-w="26">26W</button>
+      </div>
     </div>
+    <div id="status"><div class="spin" id="spin"></div><span id="stxt">Loading...</span></div>
+  </div>
+</header>
 
-    <!-- Footer with controls -->
-    <div class="footer">
-        <div class="refresh-info">
-            <div class="update-indicator">
-                <div class="update-dot"></div>
-                <span>Auto-updating every 60s</span>
-            </div>
-        </div>
-        <div>
-            <button class="refresh-btn" id="manual-refresh">
-                <span>🔄</span>
-                <span>Refresh Now</span>
-            </button>
-        </div>
+<div class="main">
+  <div id="chart"></div>
+  <aside class="sidebar">
+    <div class="sb-head">
+      <span>Sectors</span>
+      <button class="sb-add" onclick="openModal()">+ Add</button>
     </div>
+    <div id="slist"></div>
+  </aside>
+</div>
 
-    <script>
-        // Configuration
-        const POLYGON_API_KEY = 'LUAlQX3Ht3YxBpuGgHqTvEvakpCTPFYx'; // Replace with your Polygon.io API key
-        const REFRESH_INTERVAL = 60000; // 60 seconds between batch updates
-        const BATCH_SIZE = 5; // Polygon free tier allows 5 calls per minute
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h3>Add Sector / ETF</h3>
+    <input id="modal-ticker" placeholder="Ticker (e.g. XLC, GLD, QQQ)" maxlength="10"
+           onkeydown="if(event.key==='Enter')addFromModal()">
+    <input id="modal-name" placeholder="Label (e.g. Communication Svcs)" maxlength="30"
+           onkeydown="if(event.key==='Enter')addFromModal()">
+    <div class="modal-btns">
+      <button class="mbtn" onclick="closeModal()">Cancel</button>
+      <button class="mbtn primary" onclick="addFromModal()">Add</button>
+    </div>
+  </div>
+</div>
 
-        // Sector definitions with colors
-        const SECTORS = [
-            { name: "Technology", ticker: "XLK", color: "#58a6ff" },
-            { name: "Healthcare", ticker: "XLV", color: "#2ea043" },
-            { name: "Financials", ticker: "XLF", color: "#ffd33d" },
-            { name: "Consumer Discretionary", ticker: "XLY", color: "#f778ba" },
-            { name: "Industrials", ticker: "XLI", color: "#79c0ff" },
-            { name: "Consumer Staples", ticker: "XLP", color: "#a371f7" },
-            { name: "Energy", ticker: "XLE", color: "#ff7b72" },
-            { name: "Utilities", ticker: "XLU", color: "#8b949e" },
-            { name: "Real Estate", ticker: "XLRE", color: "#ffa657" },
-            { name: "Materials", ticker: "XLB", color: "#7ee787" },
-            { name: "Communication", ticker: "XLC", color: "#d2a8ff" }
-        ];
+<div id="tip"></div>
 
-        // Base prices for realistic mock data (approximate as of Dec 2024)
-        const BASE_PRICES = {
-            'XLK': 228.50, 'XLV': 142.30, 'XLF': 42.85, 'XLY': 185.20,
-            'XLI': 126.40, 'XLP': 78.90, 'XLE': 93.75, 'XLU': 66.30,
-            'XLRE': 39.85, 'XLB': 89.20, 'XLC': 116.47
-        };
+<script>
+// ── CONFIG ──────────────────────────────────────────────
+let BENCHMARK = "SPY";
 
-        // Application state
-        let currentSort = 'change';
-        let isRefreshing = false;
-        let currentBatch = 0;
-        let lastUpdateTime = Date.now();
-        let updateInterval;
+const DEFAULT_SECTORS = [
+  {ticker:"XLK",  name:"Technology",        color:"#58a6ff"},
+  {ticker:"XLF",  name:"Financials",         color:"#3fb950"},
+  {ticker:"XLV",  name:"Health Care",        color:"#a5d6ff"},
+  {ticker:"XLE",  name:"Energy",             color:"#d29922"},
+  {ticker:"XLY",  name:"Consumer Discret.",  color:"#f0883e"},
+  {ticker:"XLP",  name:"Consumer Staples",   color:"#bc8cff"},
+  {ticker:"XLI",  name:"Industrials",        color:"#79c0ff"},
+  {ticker:"XLB",  name:"Materials",          color:"#56d364"},
+  {ticker:"XLU",  name:"Utilities",          color:"#ffa657"},
+  {ticker:"XLRE", name:"Real Estate",        color:"#ff7b72"},
+  {ticker:"XLC",  name:"Comm. Services",     color:"#e3b341"},
+];
 
-        // DOM elements
-        const sectorsTable = document.getElementById('sectors-table');
-        const manualRefreshBtn = document.getElementById('manual-refresh');
-        const sortButtons = document.querySelectorAll('.sort-btn');
+const EXTRA_COLORS = [
+  "#c9d1d9","#8b949e","#b1bac4","#cae8ff","#7ee787",
+  "#ffab70","#d2a8ff","#f0f6fc","#6e7681","#79c0ff"
+];
 
-        // Initialize the application
-        function init() {
-            console.log('Initializing sector performance tracker...');
-            
-            // Load initial data from cache
-            const cachedData = loadFromCache();
-            if (cachedData.length > 0) {
-                renderTable(cachedData);
-            } else {
-                // If no cache, start with mock data
-                const mockData = generateMockData();
-                renderTable(mockData);
-            }
-            
-            // Start the staggered update cycle
-            startUpdateCycle();
-            
-            // Set up event listeners
-            setupEventListeners();
-            
-            // Initial data fetch
-            setTimeout(() => fetchNextBatch(), 1000);
-        }
+// ── STATE ────────────────────────────────────────────────
+let tailWeeks = 8;
+let hiddenSet = new Set();
+let sectors   = JSON.parse(JSON.stringify(DEFAULT_SECTORS));
+let rrgData   = {};
+let svgEl     = null;
+let benchCloses = [];
 
-        // Set up all event listeners
-        function setupEventListeners() {
-            // Manual refresh button
-            manualRefreshBtn.addEventListener('click', () => {
-                if (!isRefreshing) {
-                    fetchNextBatch(true);
-                }
-            });
-            
-            // Sort buttons
-            sortButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const sortType = btn.dataset.sort;
-                    sortButtons.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentSort = sortType;
-                    
-                    const currentData = loadFromCache();
-                    if (currentData.length > 0) {
-                        renderTable(sortData(currentData, sortType));
-                    }
-                });
-            });
-            
-            // Handle page visibility changes
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'visible') {
-                    // Page became visible, check if we need to refresh
-                    const timeSinceLastUpdate = Date.now() - lastUpdateTime;
-                    if (timeSinceLastUpdate > REFRESH_INTERVAL * 2) {
-                        fetchNextBatch();
-                    }
-                }
-            });
-        }
+// ── FETCH ────────────────────────────────────────────────
+async function fetchWeekly(ticker) {
+  const end   = Math.floor(Date.now() / 1000);
+  const start = end - 3 * 365 * 24 * 3600;
+  const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1wk&period1=${start}&period2=${end}`;
 
-        // Start the staggered update cycle
-        function startUpdateCycle() {
-            clearInterval(updateInterval);
-            updateInterval = setInterval(() => {
-                if (document.visibilityState === 'visible') {
-                    fetchNextBatch();
-                }
-            }, REFRESH_INTERVAL);
-        }
+  // CORS proxies tried in order — first one that works is used
+  const proxies = [
+    u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+    u => `https://thingproxy.freeboard.io/fetch/${u}`,
+  ];
 
-        // Fetch the next batch of sectors (5 at a time)
-        async function fetchNextBatch(force = false) {
-            if (isRefreshing && !force) return;
-            
-            isRefreshing = true;
-            manualRefreshBtn.disabled = true;
-            manualRefreshBtn.innerHTML = '<span>⏳</span><span>Updating...</span>';
-            
-            try {
-                const batchSectors = getNextBatch();
-                console.log(`Fetching batch ${currentBatch}: ${batchSectors.map(s => s.ticker).join(', ')}`);
-                
-                const results = [];
-                
-                for (const sector of batchSectors) {
-                    const sectorData = await fetchSectorData(sector);
-                    results.push(sectorData);
-                    
-                    // Delay between requests to be polite to the API
-                    await new Promise(resolve => setTimeout(resolve, 1200));
-                }
-                
-                // Update cache with new data
-                updateCache(results);
-                
-                // Load all data from cache and render
-                const allData = loadFromCache();
-                renderTable(sortData(allData, currentSort));
-                
-                // Update batch counter
-                currentBatch = (currentBatch + 1) % Math.ceil(SECTORS.length / BATCH_SIZE);
-                lastUpdateTime = Date.now();
-                
-                console.log(`Batch ${currentBatch} completed successfully`);
-                
-            } catch (error) {
-                console.error('Error fetching batch:', error);
-                
-                // Even on error, update the UI with cached data
-                const allData = loadFromCache();
-                renderTable(sortData(allData, currentSort));
-            } finally {
-                isRefreshing = false;
-                manualRefreshBtn.disabled = false;
-                manualRefreshBtn.innerHTML = '<span>🔄</span><span>Refresh Now</span>';
-            }
-        }
+  let lastErr;
+  for (const proxy of proxies) {
+    try {
+      const res = await fetch(proxy(yahooUrl));
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const j = await res.json();
+      const result = j?.chart?.result?.[0];
+      if (!result) throw new Error("No chart data");
+      const closes = result.indicators.quote[0].close;
+      const out = closes.filter(v => v != null);
+      if (out.length < 5) throw new Error("Too few bars");
+      return out;
+    } catch(e) { lastErr = e; await sleep(200); }
+  }
+  throw new Error(`All proxies failed for ${ticker}: ${lastErr?.message}`);
+}
 
-        // Get the next batch of sectors to fetch
-        function getNextBatch() {
-            const start = currentBatch * BATCH_SIZE;
-            const end = Math.min(start + BATCH_SIZE, SECTORS.length);
-            return SECTORS.slice(start, end);
-        }
+const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-        // Fetch data for a single sector
-        async function fetchSectorData(sector) {
-            // If no API key is set, use mock data
-            if (!POLYGON_API_KEY || POLYGON_API_KEY === 'YOUR_API_KEY_HERE') {
-                console.log(`No API key, using mock data for ${sector.ticker}`);
-                return generateSectorMockData(sector);
-            }
-            
-            const url = `https://api.polygon.io/v2/aggs/ticker/${sector.ticker}/prev?adjusted=true&apiKey=${POLYGON_API_KEY}`;
-            
-            try {
-                const response = await fetch(url);
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    
-                    if (data.status === "OK" && data.results && data.results.length > 0) {
-                        const result = data.results[0];
-                        const price = result.c;
-                        const changePercent = ((result.c - result.o) / result.o) * 100;
-                        
-                        return {
-                            ...sector,
-                            price: price,
-                            change: parseFloat(changePercent.toFixed(2)),
-                            updatedAt: Date.now(),
-                            source: 'polygon'
-                        };
-                    }
-                }
-                
-                console.warn(`Polygon API failed for ${sector.ticker}, using mock data`);
-                return generateSectorMockData(sector);
-                
-            } catch (error) {
-                console.error(`Error fetching ${sector.ticker}:`, error);
-                return generateSectorMockData(sector);
-            }
-        }
+function setStatus(msg, loading=false) {
+  document.getElementById("stxt").textContent = msg;
+  document.getElementById("spin").classList.toggle("on", loading);
+}
 
-        // Generate mock data for a sector
-        function generateSectorMockData(sector) {
-            const basePrice = BASE_PRICES[sector.ticker] || 100;
-            const changePercent = (Math.random() * 1 - 0.5); // Small random change
-            const price = basePrice * (1 + changePercent / 100);
-            
-            return {
-                ...sector,
-                price: parseFloat(price.toFixed(2)),
-                change: parseFloat(changePercent.toFixed(2)),
-                updatedAt: Date.now(),
-                source: 'mock'
-            };
-        }
+// ── RRG MATH ─────────────────────────────────────────────
+const ema = (arr, p) => {
+  const k = 2/(p+1); let v = arr[0];
+  return arr.map((x,i) => { if(!i) return v; v=x*k+v*(1-k); return v; });
+};
+const sma = (arr, p) => arr.map((_,i) =>
+  i<p-1 ? null : arr.slice(i-p+1,i+1).reduce((a,b)=>a+b,0)/p
+);
 
-        // Generate initial mock data for all sectors
-        function generateMockData() {
-            return SECTORS.map(sector => generateSectorMockData(sector));
-        }
+function computeRRG(sc, bc) {
+  const n  = Math.min(sc.length, bc.length);
+  const s  = sc.slice(-n), b = bc.slice(-n);
+  const rs = s.map((v,i) => (v/b[i])*100);
+  const p  = 10;
+  const sm = ema(rs, p);
+  const mn = sma(sm, p);
+  const ratio = sm.map((v,i) => mn[i]==null ? null : (v/mn[i])*100);
+  const rf    = ratio.map(v => v==null ? 100 : v);
+  const ms2   = ema(rf, p);
+  const mn2   = sma(ms2, p);
+  const mom   = ms2.map((v,i) => mn2[i]==null ? null : (v/mn2[i])*100);
+  const pts   = [];
+  for(let i=0;i<ratio.length;i++)
+    if(ratio[i]!=null && mom[i]!=null) pts.push({ratio:ratio[i], momentum:mom[i]});
+  return pts;
+}
 
-        // Cache management
-        function updateCache(sectorData) {
-            const cacheKey = 'sectors_performance_cache';
-            let cache = JSON.parse(localStorage.getItem(cacheKey) || '{}');
-            
-            sectorData.forEach(sector => {
-                cache[sector.ticker] = {
-                    ...sector,
-                    cachedAt: Date.now()
-                };
-            });
-            
-            localStorage.setItem(cacheKey, JSON.stringify(cache));
-        }
+function phase(r, m) {
+  if(r>=100&&m>=100) return "LEADING";
+  if(r>=100&&m< 100) return "WEAKENING";
+  if(r< 100&&m< 100) return "LAGGING";
+  return "IMPROVING";
+}
 
-        function loadFromCache() {
-            const cacheKey = 'sectors_performance_cache';
-            const cache = JSON.parse(localStorage.getItem(cacheKey) || '{}');
-            
-            return SECTORS.map(sector => {
-                const cached = cache[sector.ticker];
-                
-                if (cached) {
-                    return {
-                        ...sector,
-                        price: cached.price || 0,
-                        change: cached.change || 0,
-                        updatedAt: cached.updatedAt || cached.cachedAt || Date.now(),
-                        source: cached.source || 'cache'
-                    };
-                }
-                
-                // If not in cache, generate mock data
-                return generateSectorMockData(sector);
-            });
-        }
+// ── LOAD ALL ─────────────────────────────────────────────
+async function changeBenchmark(val) {
+  BENCHMARK = val;
+  rrgData = {};
+  benchCloses = [];
+  setStatus("Reloading...", true);
+  await loadAll(sectors.map(s => s.ticker));
+  renderChart();
+  renderSidebar();
+}
 
-        // Sort data based on current sort type
-        function sortData(data, sortType) {
-            const sorted = [...data];
-            
-            switch (sortType) {
-                case 'sector':
-                    sorted.sort((a, b) => a.name.localeCompare(b.name));
-                    break;
-                case 'price':
-                    sorted.sort((a, b) => b.price - a.price);
-                    break;
-                case 'ticker':
-                    sorted.sort((a, b) => a.ticker.localeCompare(b.ticker));
-                    break;
-                case 'change':
-                default:
-                    sorted.sort((a, b) => b.change - a.change);
-                    break;
-            }
-            
-            return sorted;
-        }
+async function loadAll(tickers) {
+  setStatus(`Fetching ${BENCHMARK}...`, true);
+  try { benchCloses = await fetchWeekly(BENCHMARK); }
+  catch(e) { setStatus("Failed to load benchmark"); return; }
+  await sleep(120);
 
-        // Render the table with sector data
-        function renderTable(sectorData) {
-            if (sectorData.length === 0) {
-                sectorsTable.innerHTML = `
-                    <div class="empty-state">
-                        <p>No sector data available</p>
-                        <button class="refresh-btn" onclick="fetchNextBatch(true)" style="margin-top: 16px;">
-                            Try Loading Data
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-            
-            const sortedData = sortData(sectorData, currentSort);
-            
-            const rows = sortedData.map(sector => {
-                const changeClass = sector.change >= 0 ? 'positive' : 'negative';
-                const changeSign = sector.change >= 0 ? '+' : '';
-                const changeText = `${changeSign}${sector.change.toFixed(2)}%`;
-                
-                // Format the update time
-                const updateTime = new Date(sector.updatedAt);
-                const now = new Date();
-                const diffMinutes = Math.floor((now - updateTime) / (1000 * 60));
-                
-                let timeText;
-                if (diffMinutes < 1) {
-                    timeText = 'Just now';
-                } else if (diffMinutes < 60) {
-                    timeText = `${diffMinutes}m ago`;
-                } else {
-                    timeText = updateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                }
-                
-                // Determine data source indicator
-                const sourceIndicator = sector.source === 'polygon' ? '🔄' : 
-                                      sector.source === 'cache' ? '💾' : '🔄';
-                
-                return `
-                    <div class="table-row">
-                        <div class="col-sector">
-                            <div class="sector-color" style="background: ${sector.color}"></div>
-                            <div>
-                                <div style="font-weight: 600;">${sector.name}</div>
-                                <div style="font-size: 11px; color: #8b949e; margin-top: 2px;">
-                                    ${sourceIndicator} ${sector.source}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-ticker">${sector.ticker}</div>
-                        <div class="col-price">$${sector.price.toFixed(2)}</div>
-                        <div class="col-change ${changeClass}">${changeText}</div>
-                        <div class="col-updated">${timeText}</div>
-                    </div>
-                `;
-            }).join('');
-            
-            sectorsTable.innerHTML = rows;
-        }
+  for (let i=0; i<tickers.length; i++) {
+    const t = tickers[i];
+    setStatus(`Fetching ${t}... (${i+1}/${tickers.length})`, true);
+    try {
+      const c = await fetchWeekly(t);
+      if (c.length > 20) rrgData[t] = computeRRG(c, benchCloses);
+    } catch(e) { console.warn(`${t}: ${e.message}`); }
+    if (i < tickers.length-1) await sleep(120);
+  }
 
-        // Initialize the application when the page loads
-        document.addEventListener('DOMContentLoaded', init);
-        
-        // Handle orientation changes
-        window.addEventListener('orientationchange', () => {
-            // Small delay to allow CSS to adjust
-            setTimeout(() => {
-                const currentData = loadFromCache();
-                if (currentData.length > 0) {
-                    renderTable(sortData(currentData, currentSort));
-                }
-            }, 100);
-        });
-    </script>
+  const d = new Date();
+  document.getElementById("subtitle").textContent =
+    `vs ${BENCHMARK} · Weekly bars · Updated ${d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}`;
+  setStatus("Ready");
+}
+
+async function loadOne(ticker) {
+  setStatus(`Fetching ${ticker}...`, true);
+  const c = await fetchWeekly(ticker);
+  if (c.length > 20) rrgData[ticker] = computeRRG(c, benchCloses);
+  setStatus("Ready");
+}
+
+// ── TAIL ─────────────────────────────────────────────────
+function tailPoints(ticker) {
+  const pts = rrgData[ticker];
+  if (!pts?.length) return [];
+  return pts.slice(-tailWeeks);
+}
+
+// ── SIDEBAR ──────────────────────────────────────────────
+function renderSidebar() {
+  const list = document.getElementById("slist");
+  list.innerHTML = "";
+  sectors.forEach(s => {
+    const pts  = tailPoints(s.ticker);
+    const last = pts[pts.length-1] || {};
+    const ph   = last.ratio!=null ? phase(last.ratio, last.momentum) : "–";
+    const row  = document.createElement("div");
+    row.className = "srow" + (hiddenSet.has(s.ticker) ? " hidden" : "");
+    row.innerHTML = `
+      <div class="sdot" style="background:${s.color}"></div>
+      <div class="sinfo">
+        <div class="sticker">${s.ticker}</div>
+        <div class="sname">${s.name}</div>
+      </div>
+      <div class="svals">
+        <div class="sratio" style="color:${s.color}">
+          ${last.ratio?last.ratio.toFixed(2):"–"} / ${last.momentum?last.momentum.toFixed(2):"–"}
+        </div>
+        <div class="sphase ${ph}">${ph}</div>
+      </div>
+      <div class="sdel" title="Remove" onclick="removeSector('${s.ticker}',event)">x</div>`;
+    row.addEventListener("click", e => {
+      if(e.target.classList.contains("sdel")) return;
+      toggleSector(s.ticker);
+    });
+    list.appendChild(row);
+  });
+}
+
+function toggleSector(ticker) {
+  hiddenSet.has(ticker) ? hiddenSet.delete(ticker) : hiddenSet.add(ticker);
+  renderChart(); renderSidebar();
+}
+
+function removeSector(ticker, e) {
+  e.stopPropagation();
+  sectors = sectors.filter(s => s.ticker !== ticker);
+  hiddenSet.delete(ticker);
+  delete rrgData[ticker];
+  renderChart(); renderSidebar();
+}
+
+// ── MODAL ────────────────────────────────────────────────
+function openModal() {
+  document.getElementById("modal").classList.add("open");
+  document.getElementById("modal-ticker").value = "";
+  document.getElementById("modal-name").value = "";
+  setTimeout(() => document.getElementById("modal-ticker").focus(), 50);
+}
+function closeModal() { document.getElementById("modal").classList.remove("open"); }
+
+async function addFromModal() {
+  const ticker = document.getElementById("modal-ticker").value.trim().toUpperCase();
+  const name   = document.getElementById("modal-name").value.trim() || ticker;
+  if (!ticker) return;
+  if (sectors.find(s => s.ticker === ticker)) { closeModal(); return; }
+  const color = EXTRA_COLORS[sectors.length % EXTRA_COLORS.length];
+  sectors.push({ticker, name, color});
+  closeModal();
+  try {
+    await loadOne(ticker);
+  } catch(e) {
+    setStatus(`Failed: ${ticker}`);
+  }
+  renderChart(); renderSidebar();
+}
+
+document.getElementById("modal").addEventListener("click", e => {
+  if(e.target === document.getElementById("modal")) closeModal();
+});
+
+// ── CHART ────────────────────────────────────────────────
+function renderChart() {
+  const container = document.getElementById("chart");
+  if (svgEl) svgEl.remove();
+  const W = container.clientWidth, H = container.clientHeight;
+  const m = {top:28,right:28,bottom:44,left:50};
+  const iW = W-m.left-m.right, iH = H-m.top-m.bottom;
+
+  let allR=[], allM=[];
+  sectors.forEach(s => {
+    if(hiddenSet.has(s.ticker)) return;
+    tailPoints(s.ticker).forEach(p => { allR.push(p.ratio); allM.push(p.momentum); });
+  });
+
+  const rPad = allR.length ? Math.max(100-Math.min(...allR), Math.max(...allR)-100)*1.2 : 2;
+  const mPad = allM.length ? Math.max(100-Math.min(...allM), Math.max(...allM)-100)*1.2 : 2;
+  const rMin=100-Math.max(rPad,.8), rMax=100+Math.max(rPad,.8);
+  const mMin=100-Math.max(mPad,.8), mMax=100+Math.max(mPad,.8);
+
+  const xSc = d3.scaleLinear().domain([rMin,rMax]).range([0,iW]);
+  const ySc = d3.scaleLinear().domain([mMin,mMax]).range([iH,0]);
+  const x100=xSc(100), y100=ySc(100);
+
+  svgEl = d3.select(container).append("svg").attr("width",W).attr("height",H);
+  const g = svgEl.append("g").attr("transform",`translate(${m.left},${m.top})`);
+
+  // Quadrant fills + labels
+  [
+    {x:0,   y:0,   w:x100,   h:y100,   fill:"rgba(26,42,26,.5)",  label:"IMPROVING", lx:x100*.22,         ly:16},
+    {x:x100,y:0,   w:iW-x100,h:y100,   fill:"rgba(20,40,26,.5)",  label:"LEADING",   lx:x100+(iW-x100)*.5,ly:16},
+    {x:0,   y:y100,w:x100,   h:iH-y100,fill:"rgba(42,26,26,.5)",  label:"LAGGING",   lx:x100*.22,         ly:y100+(iH-y100)*.9},
+    {x:x100,y:y100,w:iW-x100,h:iH-y100,fill:"rgba(42,34,16,.5)", label:"WEAKENING", lx:x100+(iW-x100)*.5,ly:y100+(iH-y100)*.9},
+  ].forEach(q => {
+    g.append("rect").attr("x",q.x).attr("y",q.y).attr("width",q.w).attr("height",q.h).attr("fill",q.fill);
+    g.append("text").attr("x",q.lx).attr("y",q.ly).attr("text-anchor","middle").attr("class","qlabel").text(q.label);
+  });
+
+  // Grid lines
+  xSc.ticks(8).forEach(v => g.append("line").attr("x1",xSc(v)).attr("x2",xSc(v)).attr("y1",0).attr("y2",iH)
+    .attr("stroke","rgba(255,255,255,.04)").attr("stroke-width",1));
+  ySc.ticks(8).forEach(v => g.append("line").attr("x1",0).attr("x2",iW).attr("y1",ySc(v)).attr("y2",ySc(v))
+    .attr("stroke","rgba(255,255,255,.04)").attr("stroke-width",1));
+
+  // Centre dashed
+  [[x100,x100,0,iH],[0,iW,y100,y100]].forEach(([x1,x2,y1,y2]) =>
+    g.append("line").attr("x1",x1).attr("x2",x2).attr("y1",y1).attr("y2",y2)
+      .attr("stroke","rgba(255,255,255,.22)").attr("stroke-width",1).attr("stroke-dasharray","4,4"));
+
+  // Axes
+  const axFmt = ax => {
+    ax.select(".domain").remove();
+    ax.selectAll("line").attr("stroke","var(--border)");
+    ax.selectAll("text").attr("fill","var(--muted)").attr("font-size","9px").attr("font-family","inherit");
+  };
+  g.append("g").attr("transform",`translate(0,${iH})`)
+    .call(d3.axisBottom(xSc).ticks(8).tickFormat(d3.format(".1f"))).call(axFmt);
+  g.append("g").call(d3.axisLeft(ySc).ticks(8).tickFormat(d3.format(".1f"))).call(axFmt);
+  g.append("text").attr("x",iW/2).attr("y",iH+36).attr("text-anchor","middle")
+    .attr("fill","var(--muted)").attr("font-size","10px").attr("font-family","inherit").text("RS-Ratio");
+  g.append("text").attr("transform","rotate(-90)").attr("x",-iH/2).attr("y",-38)
+    .attr("text-anchor","middle").attr("fill","var(--muted)").attr("font-size","10px").attr("font-family","inherit").text("RS-Momentum");
+
+  // Draw sectors
+  const tip = document.getElementById("tip");
+  sectors.forEach(s => {
+    if(hiddenSet.has(s.ticker)) return;
+    const pts = tailPoints(s.ticker);
+    if(!pts.length) return;
+    const n = pts.length;
+
+    // Fading tail segments
+    for(let i=1;i<n;i++) {
+      const a = 0.12 + 0.72*(i/n);
+      g.append("line")
+        .attr("x1",xSc(pts[i-1].ratio)).attr("y1",ySc(pts[i-1].momentum))
+        .attr("x2",xSc(pts[i].ratio))  .attr("y2",ySc(pts[i].momentum))
+        .attr("stroke",s.color).attr("stroke-width",1.8)
+        .attr("stroke-opacity",a).attr("stroke-linecap","round");
+    }
+
+    // Intermediate dots (smaller for weekly — 1 dot = 1 week, no clutter)
+    pts.slice(0,-1).forEach((p,i) => {
+      g.append("circle")
+        .attr("cx",xSc(p.ratio)).attr("cy",ySc(p.momentum))
+        .attr("r",2.8).attr("fill",s.color)
+        .attr("fill-opacity",0.18+0.55*(i/n)).attr("stroke","none");
+    });
+
+    // Head dot
+    const last = pts[n-1];
+    const hg = g.append("g")
+      .attr("transform",`translate(${xSc(last.ratio)},${ySc(last.momentum)})`)
+      .style("cursor","pointer");
+    hg.append("circle").attr("r",9).attr("fill",s.color).attr("fill-opacity",.15)
+      .attr("stroke",s.color).attr("stroke-width",1.5);
+    hg.append("circle").attr("r",5).attr("fill",s.color).attr("fill-opacity",.9);
+    hg.append("text").attr("dy",-13).attr("text-anchor","middle")
+      .attr("fill",s.color).attr("font-size","9px").attr("font-family","inherit")
+      .attr("font-weight","700").text(s.ticker);
+
+    hg.on("mousemove", ev => {
+      const ph = phase(last.ratio, last.momentum);
+      tip.innerHTML=`
+        <div class="tt" style="color:${s.color}">${s.ticker}</div>
+        <div style="font-size:9px;color:var(--muted);margin-bottom:5px">${s.name}</div>
+        <div class="tr"><span>RS-Ratio</span><span>${last.ratio.toFixed(3)}</span></div>
+        <div class="tr"><span>Momentum</span><span>${last.momentum.toFixed(3)}</span></div>
+        <div class="tr"><span>Phase</span><span class="${ph}">${ph}</span></div>
+        <div class="tr"><span>Tail</span><span>${n} weeks</span></div>`;
+      tip.classList.add("on");
+      tip.style.left=(ev.clientX+14)+"px";
+      tip.style.top =(ev.clientY-10)+"px";
+    }).on("mouseleave",()=>tip.classList.remove("on"));
+  });
+}
+
+// ── TAIL BUTTONS ─────────────────────────────────────────
+document.querySelectorAll(".tbtn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    tailWeeks = +btn.dataset.w;
+    document.querySelectorAll(".tbtn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    renderChart(); renderSidebar();
+  });
+});
+
+// ── RESIZE ───────────────────────────────────────────────
+let rt;
+window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(renderChart,100);});
+
+// ── INIT ─────────────────────────────────────────────────
+(async () => {
+  await loadAll(sectors.map(s=>s.ticker));
+  renderChart();
+  renderSidebar();
+})();
+</script>
 </body>
 </html>
